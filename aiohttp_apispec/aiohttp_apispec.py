@@ -40,6 +40,7 @@ class AiohttpApiSpec:
         url="/api/docs/swagger.json",
         app=None,
         request_data_name="data",
+        template_base_url="",
         swagger_path=None,
         static_path='/static/swagger',
         error_callback=None,
@@ -53,6 +54,7 @@ class AiohttpApiSpec:
         self.spec = APISpec(plugins=(self.plugin,), openapi_version="2.0", **kwargs)
 
         self.url = url
+        self.template_base_url = template_base_url
         self.swagger_path = swagger_path
         self.static_path = static_path
         self._registered = False
@@ -109,9 +111,20 @@ class AiohttpApiSpec:
                 static_path = app.router[NAME_SWAGGER_STATIC].url_for(filename=INDEX_PAGE)
                 static_path = os.path.dirname(str(static_path))
 
-            self._index_page = Template(swg_tmp.read()).render(path=url, static=static_path)
+            final_url = self._join_urls(self.template_base_url, url)
+            self._index_page = Template(swg_tmp.read()).render(path=final_url, static=static_path)
 
         return self._index_page
+
+    def _join_urls(self, url1: str, url2: str):
+        if url1.endswith("/") and url2.startswith("/"):
+            url = url1 + url2[1:]
+        elif not url1.endswith("/") and url2.startswith("/"):
+            url = url1 + url2
+        else:
+            url = f"{url1}/{url2}"
+
+        return url
 
     def _add_swagger_web_page(
         self, app: web.Application, static_path: str, view_path: str
@@ -220,6 +233,7 @@ def setup_aiohttp_apispec(
     version: str = "0.0.1",
     url: str = "/api/docs/swagger.json",
     request_data_name: str = "data",
+    template_base_url: str = "",
     swagger_path: str = None,
     static_path: str = '/static/swagger',
     error_callback=None,
@@ -273,6 +287,7 @@ def setup_aiohttp_apispec(
     :param str request_data_name: name of the key in Request object
                                   where validated data will be placed by
                                   validation_middleware (``'data'`` by default)
+    :param str template_base_url: base path used by swaggerUI to support subapps and apps with a custom ingress
     :param str swagger_path: experimental SwaggerUI support (starting from v1.1.0).
                              By default it is None (disabled)
     :param str static_path: path for static files used by SwaggerUI
@@ -291,6 +306,7 @@ def setup_aiohttp_apispec(
         request_data_name,
         title=title,
         version=version,
+        template_base_url=template_base_url,
         swagger_path=swagger_path,
         static_path=static_path,
         error_callback=error_callback,

@@ -8,9 +8,9 @@ def read(file_name):
 
 
 setup(
-    name='aiohttp-apispec',
+    name='wm_aiohttp-apispec',
     version='2.2.3',
-    description='Build and document REST APIs with aiohttp and apispec',
+    description="Fork version of aiohttp-apispec library. Contains some changes in registering template urls.",
     long_description=read('README.md'),
     long_description_content_type="text/markdown",
     author='Danilchenko Maksim',
