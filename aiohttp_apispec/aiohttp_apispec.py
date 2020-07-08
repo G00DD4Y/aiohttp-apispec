@@ -111,7 +111,7 @@ class AiohttpApiSpec:
                 static_path = app.router[NAME_SWAGGER_STATIC].url_for(filename=INDEX_PAGE)
                 static_path = os.path.dirname(str(static_path))
 
-            final_url = self._join_urls(self.template_base_url, url)
+            final_url = self._join_urls(self.template_base_url, url.path)
             self._index_page = Template(swg_tmp.read()).render(path=final_url, static=static_path)
 
         return self._index_page
