@@ -10,6 +10,7 @@ from apispec.core import VALID_METHODS_OPENAPI_V2
 from apispec.ext.marshmallow import MarshmallowPlugin, common
 from jinja2 import Template
 from webargs.aiohttpparser import parser
+from yarl import URL
 
 from .utils import get_path, get_path_keys, issubclass_py37fix
 
@@ -111,20 +112,11 @@ class AiohttpApiSpec:
                 static_path = app.router[NAME_SWAGGER_STATIC].url_for(filename=INDEX_PAGE)
                 static_path = os.path.dirname(str(static_path))
 
-            final_url = self._join_urls(self.template_base_url, url.path)
-            self._index_page = Template(swg_tmp.read()).render(path=final_url, static=static_path)
+            final_url = URL(self.template_base_url).path + url.path
+            final_static_path = URL(self.template_base_url).path + static_path
+            self._index_page = Template(swg_tmp.read()).render(path=final_url, static=final_static_path)
 
         return self._index_page
-
-    def _join_urls(self, url1: str, url2: str):
-        if url1.endswith("/") and url2.startswith("/"):
-            url = url1 + url2[1:]
-        elif not url1.endswith("/") and url2.startswith("/"):
-            url = url1 + url2
-        else:
-            url = f"{url1}/{url2}"
-
-        return url
 
     def _add_swagger_web_page(
         self, app: web.Application, static_path: str, view_path: str

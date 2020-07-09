@@ -9,7 +9,7 @@ def read(file_name):
 
 setup(
     name='wm_aiohttp-apispec',
-    version='2.2.1-rc1',
+    version='2.2.1-rc2',
     description="Fork version of aiohttp-apispec library. Contains some changes in registering template urls.",
     long_description=read('README.md'),
     long_description_content_type="text/markdown",
